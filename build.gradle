@@ -1,29 +1,125 @@
-group = 'com.khphub'
-
 buildscript {
-    repositories {
-        jcenter() 
+  repositories {
+        jcenter()
+   }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
+group = 'com.khphub'
+version = '0.1.2'
+
+allprojects {
+	repositories {
+	    jcenter()
+	}
+	apply plugin: 'maven'
+	apply plugin: 'maven-publish'
+	apply plugin: 'java'
+}
+
+// Create the pom configuration:
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
     }
-    dependencies {
-        classpath 'com.novoda:bintray-release:0.5.0' 
+    developers {
+        developer {
+            id "keehyun2"
+            name "keehyun Park"
+            email "keehyun2@gmail.com"
+        }
+    }
+    
+    scm {
+       url "https://github.com/keehyun2/bowl"
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'com.novoda.bintray-release'  
+task sourcesJar(type: Jar, dependsOn:classes) { 
+     classifier = 'sources' 
+     from sourceSets.main.allSource 
+} 
 
-version = '0.1.0'
+task javadocJar(type: Jar, dependsOn:javadoc) { 
+     classifier = 'javadoc' 
+     from javadoc.destinationDir 
+} 
+
+publishing {
+	publications {
+		MyPublication(MavenPublication) {
+			from components.java
+			artifact sourcesJar
+			artifact javadocJar
+			groupId 'com.khphub'
+        		artifactId 'bowl'
+        		version '0.1.2'
+        		pom.withXml {
+                def root = asNode()
+//                root.appendNode('description', 'Your description of the lib')
+//                root.appendNode('name', 'Your name of the lib')
+//                root.appendNode('url', 'https://site_for_lib.tld')
+                root.children().last() + pomConfig
+            }
+		}
+	}
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+	key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['MyPublication']
+    
+//    dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
+//    publish = true //[Default: false] Whether version should be auto published after an upload    
+//    override = false //[Default: false] Whether to override version artifacts already published
+    
+	pkg {
+		repo = 'maven'
+        name = 'bowl'
+        userOrg = 'keehyun20'
+		desc = 'what a fantastic package indeed!'
+        websiteUrl = 'https://github.com/keehyun2/bowl'
+        issueTrackerUrl = 'https://github.com/keehyun2/bowl/issues'
+		vcsUrl = 'https://github.com/keehyun2/bowl.git'
+		licenses = ['Apache-2.0']
+		labels = ['khphub', 'keehyun Park', 'bowl']
+		publicDownloadNumbers = true
+		
+		githubRepo = 'keehyun2/bowl' //Optional Github repository
+        githubReleaseNotesFile = 'README.md' //Optional Github readme file
+        
+		version {
+			name = '1.2'
+	        desc = 'bowl util 1.2'
+	        released  = new Date()
+	        vcsTag = '0.1.2'
+//	        gpg {
+//                sign = true //Determines whether to GPG sign the files. The default is false
+//                passphrase = 'passphrase' //Optional. The passphrase for GPG signing'
+//            }
+            //Optional configuration for Maven Central sync of the version
+//            mavenCentralSync {
+//                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+//                user = 'userToken' //OSS user token: mandatory
+//                password = 'paasword' //OSS user password: mandatory
+//                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
+		}
+	}
+}
 
 description = 'bowl'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-
-repositories {
-	mavenCentral()
-     jcenter()
-}
 
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
@@ -36,13 +132,3 @@ dependencies {
     
 }
 
-publish {  
-    userOrg = 'khphub'  
-    groupId = 'com.khphub'  
-    artifactId = 'bowl'  
-    publishVersion = '0.1.0'  
-    desc = 'I have created some useful functions'  
-    website = 'https://github.com/keehyun2/bowl'  
-    issueTracker = "${website}/issues"  
-    repository = "${website}.git"  
-}  
