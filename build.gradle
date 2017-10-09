@@ -8,12 +8,11 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
-group = 'com.khphub'
+group = 'com.github.keehyun2'
 description = 'bowl'
 version = '0.1.2'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+
 
 allprojects {
 	repositories {
@@ -62,7 +61,7 @@ publishing {
 			from components.java
 			artifact sourcesJar
 			artifact javadocJar
-			groupId 'com.khphub'
+			groupId 'com.github.keehyun2'
         		artifactId 'bowl'
         		version '0.1.2'
         		pom.withXml {
@@ -94,7 +93,7 @@ bintray {
         issueTrackerUrl = 'https://github.com/keehyun2/bowl/issues'
 		vcsUrl = 'https://github.com/keehyun2/bowl.git'
 		licenses = ['Apache-2.0']
-		labels = ['khphub', 'keehyun Park', 'bowl']
+		labels = ['keehyun2', 'keehyun Park', 'bowl']
 		publicDownloadNumbers = true
 		
 		githubRepo = 'keehyun2/bowl' //Optional Github repository
@@ -133,11 +132,14 @@ uploadArchives {
 				authentication(userName: project.property('nexus.user'), password: project.property('nexus.pw'))
 			}
 			pom.version = "0.1.2"
-			pom.groupId = "com.khphub"
+			pom.groupId = "com.github.keehyun2"
 			pom.artifactId = "bowl"
 		}
 	}
 }
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
